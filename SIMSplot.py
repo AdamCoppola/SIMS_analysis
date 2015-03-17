@@ -42,7 +42,35 @@ class Survey(object):
                                         CSVfile,
                                         week))
         self.questions = questions
-    
+        
+    def makeWorm(self, student_id):
+        id_responses = []
+        for question in self.questions:
+            for res in question.responses:
+                if res.ID == str(student_id):
+                    id_responses.append((res.qnumb, res.value))
+        a_res = []
+        e_res = []
+        r_res = []
+        i_res = []
+        
+        for res in id_responses:
+            if qtypes[res[0]] == 'I':
+                i_res.append(res[1])
+            elif qtypes[res[0]] == 'A':
+                a_res.append(res[1])
+            elif qtypes[res[0]] == 'E':
+                e_res.append(res[1])
+            elif qtypes[res[0]] == 'R':
+                r_res.append(res[1])
+        a_val = sum(a_res)/len(a_res)
+        e_val = sum(e_res)/len(e_res)
+        r_val = sum(r_res)/len(r_res)
+        i_val = sum(i_res)/len(i_res)
+        
+        plt.plot([a_val,e_val,r_val,i_val])
+        plt.show()
+        
 class Question(object):
     """As many questions as there are on the survey
         Attributes:
@@ -87,6 +115,7 @@ class Question(object):
                                 self.qnumb,
                                 week,
                                 int(thisLine[self.qnumb])))
+                
         except StopIteration:
             return (responses)
         
@@ -113,6 +142,7 @@ class Question(object):
             plt.text(x, y, str(y), ha='center', va='bottom')
         plt.show()
         
+        
 class Response(object):
     """One Response object for each response on the survey
         Attributes:
@@ -131,9 +161,9 @@ class Response(object):
         self.moVal = self.defineMoVal()
         
     def defineMoVal(self):
-        moVal = (self.value-4)*qMoVals[self.qtype]
+        moVal = (self.value-4)*moWeights[self.qtype]
         return(moVal)
-        
+
         
         
 #class User(object):
@@ -155,6 +185,10 @@ Week1Survey = Survey('Week1Quant.csv', 1)
 for question in Week1Survey.questions:
     question.plotHist()
     print(question.qtype, question.moQual)
+
+Week1Survey.makeWorm(1512)
+    
+
 #    for response in question.responses:
 #        print(response.moVal)
 #print(len(Week1Survey.questions))
